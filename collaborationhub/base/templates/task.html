@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CJID - Task Management</title>
+    <link rel="stylesheet" href="{% static 'my-css/taskc.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="hUlXeea6-1-1.png" alt="CJID Logo" class="sidebar-logo">
+                <span class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li class="active"><a href="task.html"><i class="fas fa-tasks"></i> <span>Task Management</span></a></li>
+                <li class="sidebar-divider"></li>
+                <li><a href=""><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1>Task Management</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search tasks..." id="searchTasks">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="create-task-btn" id="createTaskBtn">
+                        <i class="fas fa-plus"></i> <span>New Task</span>
+                    </button>
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                    <div class="user-profile" id="userProfile">
+                        <img src="{{ user.profile_image.url|default:'{% static "images/default-avatar.png" %}' }}" alt="{{ user.username }}">
+                        <div class="user-info">
+                            <span class="user-name">{{ user.get_full_name }}</span>
+                            <span class="user-role">{{ user.role }}</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Task Management Content -->
+            <div class="task-content">
+                <!-- Task Filters -->
+                <div class="task-filters">
+                    <div class="filter-group">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter">
+                            <option value="all">All</option>
+                            <option value="todo">To-Do</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="priorityFilter">Priority:</label>
+                        <select id="priorityFilter">
+                            <option value="all">All</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="assigneeFilter">Assignee:</label>
+                        <select id="assigneeFilter">
+                            <option value="all">All</option>
+                            <option value="me">Assigned to me</option>
+                            <option value="unassigned">Unassigned</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn" data-view="list" id="listViewBtn">
+                            <i class="fas fa-list"></i> List
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="kanban-board" id="kanbanBoard">
+                    <!-- To-Do Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <h3>To-Do</h3>
+                            <span class="task-count" id="todoCount">0</span>
+                        </div>
+                        <div class="column-content" id="todoColumn">
+                            <!-- Tasks will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <h3>In Progress</h3>
+                            <span class="task-count" id="inProgressCount">0</span>
+                        </div>
+                        <div class="column-content" id="inProgressColumn">
+                            <!-- Tasks will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Completed Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <h3>Completed</h3>
+                            <span class="task-count" id="completedCount">0</span>
+                        </div>
+                        <div class="column-content" id="completedColumn">
+                            <!-- Tasks will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div class="task-list" id="taskList">
+                    <div class="task-list-header">
+                        <div>Task</div>
+                        <div>Due Date</div>
+                        <div>Assignee</div>
+                        <div>Priority</div>
+                        <div>Actions</div>
+                    </div>
+                    <div id="taskListContent">
+                        <!-- Tasks will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Task Modal (Hidden by default) -->
+        <div class="modal" id="taskModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Create New Task</h2>
+                    <span class="close-modal" id="closeModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="taskId" name="task_id">
+                        <div class="form-group">
+                            <label for="taskTitle">Task Title</label>
+                            <input type="text" id="taskTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDescription">Description</label>
+                            <textarea id="taskDescription" name="description" rows="4"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="taskAssignee">Assign To</label>
+                                <select id="taskAssignee" name="assignee">
+                                    <option value="" selected disabled>Select team member</option>
+                                    {% for team_member in team_members %}
+                                    <option value="{{ team_member.id }}">{{ team_member.get_full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group half">
+                                <label for="taskDueDate">Due Date</label>
+                                <input type="date" id="taskDueDate" name="due_date">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="taskStatus">Status</label>
+                                <select id="taskStatus" name="status">
+                                    <option value="todo" selected>To-Do</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskAttachments">Attachments</label>
+                            <div class="file-upload">
+                                <input type="file" id="taskAttachments" name="attachments" multiple>
+                                <label for="taskAttachments" class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i> Choose files
+                                </label>
+                                <div id="fileList" class="file-list"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn" id="cancelTaskBtn">Cancel</button>
+                    <button class="save-btn" id="saveTaskBtn">Create Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'my-js/main.js' %}"></script>
+    <script src="{% static 'my-js/tasks.js' %}"></script>
+</body>
+</html>
