@@ -1,0 +1,250 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #ddd, #121113);
+    padding: 20px;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.tab-content {
+    position: relative;
+    height: auto;
+    overflow: hidden;
+}
+
+#signin-tab:checked ~ .tab-content .signin-form,
+#signup-tab:checked ~ .tab-content .signup-form {
+    transform: translateX(0);
+    transition: all 0.5s ease;
+}
+
+#signin-tab:checked ~ .tab-content .signup-form,
+#signup-tab:checked ~ .tab-content .signin-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.form-container {
+    width: 100%;
+    padding: 30px;
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo {
+    font-size: 36px;
+    font-weight: bold;
+    color: #3498db;
+    letter-spacing: 2px;
+}
+
+.logo-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 24px;
+}
+
+.form-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #555;
+    font-size: 14px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-container input {
+    padding-right: 40px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+    user-select: none;
+}
+
+.password-toggle:hover {
+    color: #0f1113;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    appearance: none;
+    padding-right: 30px;
+    cursor: pointer;
+}
+
+.select-wrapper::after {
+    content: '▼';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #666;
+    pointer-events: none;
+}
+
+.account-type {
+    display: flex;
+    gap: 10px;
+}
+
+.account-type label {
+    flex: 1;
+    padding: 12px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.account-type label:hover {
+    border-color: #3498db;
+}
+
+.account-type input[type="radio"] {
+    display: none;
+}
+
+.account-type input[type="radio"]:checked + label {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    background: #3498db;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    margin: -10px 0 20px;
+    color: #3498db;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.form-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-switch label {
+    color: #3498db;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.form-switch label:hover {
+    text-decoration: underline;
+}
+
+#show-password:checked ~ input {
+    -webkit-text-security: none;
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        padding: 20px;
+    }
+    
+    .account-type {
+        flex-direction: column;
+    }
+}
