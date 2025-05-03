@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CJID - Dashboard</title>
     <link rel="stylesheet" href="{% static 'my-css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'my-js/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -36,19 +37,27 @@
                     <h1>Dashboard</h1>
                 </div>
                 <div class="header-right">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <button><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="notification-bell">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-count"></span>
-                    </div>
+
                     <div class="user-profile">
-                        <img src="/api/placeholder/40/40" alt="User Avatar">
                         <div class="user-info">
-                            <span class="user-name">Muhammad Nasir</span>
-                            <span class="user-role">Administrator</span>
+                            <span class="user-name">{{user.username}}</span>
+
+                            {% if user_teams %}
+                            <ul>
+                                {% for team in user_teams %}
+                                <span class="user-role">{{ team.name }}</span>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>You are not part of any team.</p>
+                        {% endif %}
+
+                            <!-- {% if user.team %}
+                            <span class="user-role">{{ user.team.name }}</span>
+                            {% else %}
+                            <span class="user-role">No team</span>
+                            {% endif %} -->
+                            
                         </div>
                     </div>
                 </div>

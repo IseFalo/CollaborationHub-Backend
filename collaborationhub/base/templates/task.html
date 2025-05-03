@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban Board</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/taskc.css' %}">
+    <link rel="stylesheet" href="{% static 'my-css/taskc.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 </head>
@@ -18,13 +19,13 @@
             <span class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></span>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li class="active"><a href="{% url 'tasks' %}"><i class="fas fa-tasks"></i> <span>Task Management</span></a></li>
+            <li><a href=""><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li class="active"><a href=""><i class="fas fa-tasks"></i> <span>Task Management</span></a></li>
             <li class="sidebar-divider"></li>
-            <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href=""><i class="fas fa-cog"></i> <span>Settings</span></a></li>
         </ul>
         <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            <a href="" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
         </div>
     </nav>
 
@@ -48,7 +49,7 @@
                     <span class="notification-count" id="notificationCount">0</span>
                 </div>
                 <div class="user-profile" id="userProfile">
-                    <img src="{{ user.profile_image.url|default:'{% static "images/default-avatar.png" %}' }}" alt="{{ user.username }}">
+                    <!-- <img src="{{ user.profile_image.url|default:'{% static "images/default-avatar.png" %}' }}" alt="{{ user.username }}"> -->
                     <div class="user-info">
                         <span class="user-name">{{ user.get_full_name }}</span>
                         <span class="user-role">{{ user.role }}</span>
@@ -61,38 +62,44 @@
         
         <!-- Kanban Board -->
         <div class="kanban-board" id="kanbanBoard">
-            <!-- To-Do Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>To-Do</h3>
-                    <span class="task-count" id="todoCount">0</span>
-                </div>
-                <div class="column-content" id="todoColumn">
-                    <!-- Tasks will be loaded dynamically -->
-                </div>
+        <!-- TO DO Column -->
+        <div class="column-content" id="todoColumn">
+            {% for task in todo_tasks %}
+            <div class="task-card">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <small>Assigned to: {{ task.assigned_to.username }}</small>
             </div>
-            
-            <!-- In Progress Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>In Progress</h3>
-                    <span class="task-count" id="inProgressCount">0</span>
-                </div>
-                <div class="column-content" id="inProgressColumn">
-                    <!-- Tasks will be loaded dynamically -->
-                </div>
+            {% empty %}
+            <p>No tasks</p>
+            {% endfor %}
+        </div>
+        
+        <!-- IN PROGRESS Column -->
+        <div class="column-content" id="inProgressColumn">
+            {% for task in in_progress_tasks %}
+            <div class="task-card">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <small>Assigned to: {{ task.assigned_to.username }}</small>
             </div>
-            
-            <!-- Completed Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>Completed</h3>
-                    <span class="task-count" id="completedCount">0</span>
-                </div>
-                <div class="column-content" id="completedColumn">
-                    <!-- Tasks will be loaded dynamically -->
-                </div>
+            {% empty %}
+            <p>No tasks</p>
+            {% endfor %}
+        </div>
+        
+        <!-- COMPLETED Column -->
+        <div class="column-content" id="completedColumn">
+            {% for task in completed_tasks %}
+            <div class="task-card">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <small>Assigned to: {{ task.assigned_to.username }}</small>
             </div>
+            {% empty %}
+            <p>No tasks</p>
+            {% endfor %}
+        </div>
         </div>
     </div>
 
@@ -105,7 +112,7 @@
                       <span class="close-modal" id="closeModal">&times;</span>
                   </div>
                   <div class="modal-body">
-                      <form id="taskForm" method="post" enctype="multipart/form-data">
+                      <form id="taskForm" method="POST">
                           {% csrf_token %}
                           <input type="hidden" id="taskId" name="task_id">
                           <div class="form-group">
@@ -122,14 +129,11 @@
                                   <select id="taskAssignee" name="assignee">
                                       <option value="" selected disabled>Select team member</option>
                                       {% for team_member in team_members %}
-                                      <option value="{{ team_member.id }}">{{ team_member.get_full_name }}</option>
+                                      <option value="{{ team_member.id }}">{{ team_member.full_name }}</option>
                                       {% endfor %}
                                   </select>
                               </div>
-                              <div class="form-group half">
-                                  <label for="taskDueDate">Due Date</label>
-                                  <input type="date" id="taskDueDate" name="due_date">
-                              </div>
+
                           </div>
                           <div class="form-row">
                               <div class="form-group half">
@@ -140,34 +144,18 @@
                                       <option value="completed">Completed</option>
                                   </select>
                               </div>
-                              <div class="form-group half">
-                                  <label for="taskPriority">Priority</label>
-                                  <select id="taskPriority" name="priority">
-                                      <option value="low">Low</option>
-                                      <option value="medium" selected>Medium</option>
-                                      <option value="high">High</option>
-                                  </select>
-                              </div>
+
                           </div>
-                          <div class="form-group">
-                              <label for="taskAttachments">Attachments</label>
-                              <div class="file-upload">
-                                  <input type="file" id="taskAttachments" name="attachments" multiple>
-                                  <label for="taskAttachments" class="file-upload-label">
-                                      <i class="fas fa-cloud-upload-alt"></i> Choose files
-                                  </label>
-                                  <div id="fileList" class="file-list"></div>
-                              </div>
-                          </div>
+                          <div class="modal-footer">
+                            <button class="cancel-btn" id="cancelTaskBtn">Cancel</button>
+                            <button class="save-btn" id="saveTaskBtn">Create Task</button>
+                        </div>
                       </form>
                   </div>
-                  <div class="modal-footer">
-                      <button class="cancel-btn" id="cancelTaskBtn">Cancel</button>
-                      <button class="save-btn" id="saveTaskBtn">Create Task</button>
-                  </div>
+
               </div>
           </div>
       </div>
-    <script src="{% static 'css/tasks.css' %}"></script>
+    <script src="{% static 'my-js/tasks.js' %}"></script>
 </body>
 </html>
