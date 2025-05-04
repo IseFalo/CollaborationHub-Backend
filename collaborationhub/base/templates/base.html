@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'my-css/taskc.css' %}">
+    <link rel="stylesheet" href="{% static 'my-css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="{% static 'images/logo.png' %}" alt="CJID Logo" class="sidebar-logo">
+                <span class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <a href="{% url 'home' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'task' %}active{% endif %}">
+                    <a href="{% url 'task' %}"><i class="fas fa-tasks"></i> <span>Task Manager</span></a>
+                </li>
+                <li class="sidebar-divider"></li>
+                <!-- <li class="{% if request.path == '/settings/' %}active{% endif %}">
+                    <a href=""><i class="fas fa-cog"></i> <span>Settings</span></a>
+                </li> -->
+            </ul>
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="header">
+                <div class="header-left">
+                    {% if request.resolver_match.url_name == 'task' %}
+                    <h1>Task Manager</h1>
+                    {% else %}
+                    <h1>Dashboard</h1>
+                    {% endif %}
+                    
+
+                </div>
+                <div class="header-right">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                        Create Task
+                      </button>
+
+
+  
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name">{{user.username}}</span>
+
+                            {% if user_teams %}
+                            <ul>
+                                {% for team in user_teams %}
+                                <span class="user-role">{{ team.name }}</span>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>You are not part of any team.</p>
+                        {% endif %}
+
+                            <!-- {% if user.team %}
+                            <span class="user-role">{{ user.team.name }}</span>
+                            {% else %}
+                            <span class="user-role">No team</span>
+                            {% endif %} -->
+                            
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+
+
+
+
+
+                    <!-- Modal Form -->
+<form method="POST" action="{% url 'create_task' %}">
+    {% csrf_token %}
+    <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createTaskModalLabel">Create Task</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                <label for="title" class="form-label">Task Title</label>
+                <input type="text" class="form-control" name="title" id="title" required>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" name="description" id="description"></textarea>
+              </div>
+              <div class="mb-3">
+                <p><strong>Team Members:</strong> {{ team_members|length }}</p>
+                <label for="assignee" class="form-label">Assign To</label>
+                <select class="form-select" name="assignee" id="assignee" required>
+                  {% for member in team_members %}
+                    <option value="{{ member.id }}">{{ member.full_name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" name="status" id="status">
+                  <option value="todo">To-Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Create Task</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  
+
+
+
+
+
+<script src="{% static 'my-js/tasks.js' %}"></script>
+<script src="{% static 'my-js/main.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js" integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+" crossorigin="anonymous"></script>
+{% block content %}
+{% endblock %}
+</body>
+</html>

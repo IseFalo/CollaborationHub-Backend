@@ -16,7 +16,7 @@ class Team(models.Model):
 
 class CustomUser(AbstractUser):
     full_name = models.CharField(max_length=100)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
+    
 
     def __str__(self):
         return self.username
