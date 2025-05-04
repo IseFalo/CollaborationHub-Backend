@@ -1,173 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban Board</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/taskc.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    
 
 </head>
 <body>
   <div class="app-container">
-    <!-- Sidebar Navigation -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="{% static 'images/logo.png' %}" alt="CJID Logo" class="sidebar-logo">
-            <span class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></span>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li class="active"><a href="{% url 'tasks' %}"><i class="fas fa-tasks"></i> <span>Task Management</span></a></li>
-            <li class="sidebar-divider"></li>
-            <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
-        </div>
-    </nav>
+{% block content %}
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <!-- Top Header -->
-        <header class="header">
-            <div class="header-left">
-                <h1>Task Management</h1>
-            </div>
-            <div class="header-right">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search tasks..." id="searchTasks">
-                    <button><i class="fas fa-search"></i></button>
-                </div>
-                <button class="create-task-btn" id="createTaskBtn">
-                    <i class="fas fa-plus"></i> <span>New Task</span>
-                </button>
-                <div class="notification-bell" id="notificationBell">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-count" id="notificationCount">0</span>
-                </div>
-                <div class="user-profile" id="userProfile">
-                    <img src="{{ user.profile_image.url|default:'{% static "images/default-avatar.png" %}' }}" alt="{{ user.username }}">
-                    <div class="user-info">
-                        <span class="user-name">{{ user.get_full_name }}</span>
-                        <span class="user-role">{{ user.role }}</span>
+   
+
+   
+
+<div class="container mt-5">
+    <div class="row text-center mb-4">
+        <div class="col-md-4"><h4>To-Do</h4></div>
+        <div class="col-md-4"><h4>In Progress</h4></div>
+        <div class="col-md-4"><h4>Completed</h4></div>
+    </div>
+
+    <div class="row">
+        <!-- To-Do Column -->
+        <div class="col-md-4">
+            {% for task in todo_tasks %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.title }}</h5>
+                    <p class="card-text">{{ task.description }}</p>
+                    <small>Assigned to: {{ task.assigned_to.username }}</small>
+
+                    <!-- Dropdown -->
+                    <div class="dropdown text-end mt-2">
+                        <a class="text-muted" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            &#x22EE;
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'move_to_in_progress' task.id %}">Move to In Progress</a></li>
+                            <li><a class="dropdown-item" href="{% url 'move_to_completed' task.id %}">Move to Completed</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </header>
+            {% empty %}
+            <p class="text-muted">No To-Do tasks.</p>
+            {% endfor %}
+        </div>
 
-    <div class="container">
-        
-        <!-- Kanban Board -->
-        <div class="kanban-board" id="kanbanBoard">
-            <!-- To-Do Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>To-Do</h3>
-                    <span class="task-count" id="todoCount">0</span>
-                </div>
-                <div class="column-content" id="todoColumn">
-                    <!-- Tasks will be loaded dynamically -->
-                </div>
-            </div>
-            
-            <!-- In Progress Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>In Progress</h3>
-                    <span class="task-count" id="inProgressCount">0</span>
-                </div>
-                <div class="column-content" id="inProgressColumn">
-                    <!-- Tasks will be loaded dynamically -->
+        <!-- In Progress Column -->
+        <div class="col-md-4">
+            {% for task in in_progress_tasks %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.title }}</h5>
+                    <p class="card-text">{{ task.description }}</p>
+                    <small>Assigned to: {{ task.assigned_to.username }}</small>
+
+                    <!-- Dropdown -->
+                    <div class="dropdown text-end mt-2">
+                        <a class="text-muted" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            &#x22EE;
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'move_to_todo' task.id %}">Move to To-Do</a></li>
+                            <li><a class="dropdown-item" href="{% url 'move_to_completed' task.id %}">Move to Completed</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Completed Column -->
-            <div class="kanban-column">
-                <div class="column-header">
-                    <h3>Completed</h3>
-                    <span class="task-count" id="completedCount">0</span>
-                </div>
-                <div class="column-content" id="completedColumn">
-                    <!-- Tasks will be loaded dynamically -->
+            {% empty %}
+            <p class="text-muted">No In Progress tasks.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Completed Column -->
+        <div class="col-md-4">
+            {% for task in completed_tasks %}
+            <div class="card mb-3 border-success">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.title }}</h5>
+                    <p class="card-text">{{ task.description }}</p>
+                    <small>Assigned to: {{ task.assigned_to.username }}</small>
+
+                    <!-- Dropdown -->
+                    <div class="dropdown text-end mt-2">
+                        <a class="text-muted" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            &#x22EE;
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'move_to_todo' task.id %}">Move to To-Do</a></li>
+                            <li><a class="dropdown-item" href="{% url 'move_to_in_progress' task.id %}">Move to In Progress</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+            {% empty %}
+            <p class="text-muted">No Completed tasks.</p>
+            {% endfor %}
         </div>
     </div>
+</div>
 
-    <!-- default hidden for form task -->
-             <!-- Task Modal (Hidden by default) -->
-             <div class="modal" id="taskModal">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h2 id="modalTitle">Create New Task</h2>
-                      <span class="close-modal" id="closeModal">&times;</span>
-                  </div>
-                  <div class="modal-body">
-                      <form id="taskForm" method="post" enctype="multipart/form-data">
-                          {% csrf_token %}
-                          <input type="hidden" id="taskId" name="task_id">
-                          <div class="form-group">
-                              <label for="taskTitle">Task Title</label>
-                              <input type="text" id="taskTitle" name="title" required>
-                          </div>
-                          <div class="form-group">
-                              <label for="taskDescription">Description</label>
-                              <textarea id="taskDescription" name="description" rows="4"></textarea>
-                          </div>
-                          <div class="form-row">
-                              <div class="form-group half">
-                                  <label for="taskAssignee">Assign To</label>
-                                  <select id="taskAssignee" name="assignee">
-                                      <option value="" selected disabled>Select team member</option>
-                                      {% for team_member in team_members %}
-                                      <option value="{{ team_member.id }}">{{ team_member.get_full_name }}</option>
-                                      {% endfor %}
-                                  </select>
-                              </div>
-                              <div class="form-group half">
-                                  <label for="taskDueDate">Due Date</label>
-                                  <input type="date" id="taskDueDate" name="due_date">
-                              </div>
-                          </div>
-                          <div class="form-row">
-                              <div class="form-group half">
-                                  <label for="taskStatus">Status</label>
-                                  <select id="taskStatus" name="status">
-                                      <option value="todo" selected>To-Do</option>
-                                      <option value="inprogress">In Progress</option>
-                                      <option value="completed">Completed</option>
-                                  </select>
-                              </div>
-                              <div class="form-group half">
-                                  <label for="taskPriority">Priority</label>
-                                  <select id="taskPriority" name="priority">
-                                      <option value="low">Low</option>
-                                      <option value="medium" selected>Medium</option>
-                                      <option value="high">High</option>
-                                  </select>
-                              </div>
-                          </div>
-                          <div class="form-group">
-                              <label for="taskAttachments">Attachments</label>
-                              <div class="file-upload">
-                                  <input type="file" id="taskAttachments" name="attachments" multiple>
-                                  <label for="taskAttachments" class="file-upload-label">
-                                      <i class="fas fa-cloud-upload-alt"></i> Choose files
-                                  </label>
-                                  <div id="fileList" class="file-list"></div>
-                              </div>
-                          </div>
-                      </form>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="cancel-btn" id="cancelTaskBtn">Cancel</button>
-                      <button class="save-btn" id="saveTaskBtn">Create Task</button>
-                  </div>
-              </div>
-          </div>
-      </div>
-    <script src="{% static 'css/tasks.css' %}"></script>
+        
+    
+{% endblock %}
 </body>
 </html>

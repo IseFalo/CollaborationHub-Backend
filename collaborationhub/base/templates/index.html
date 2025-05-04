@@ -1,101 +1,49 @@
+{% extends 'base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CJID - Dashboard</title>
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    
     <link rel="stylesheet" href="{% static 'my-css/styles.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'my-js/styles.css' %}"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <img src="hUlXeea6-1-1.png" alt="CJID Logo" class="sidebar-logo">
-                <span class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></span>
+    {% block content %}
+    <div class="container">
+        <div class="row mt-5">
+            <!-- Column 1: Pending Tasks -->
+            <div class="col-md-6">
+                <h3>Pending Tasks</h3>
+                <ul class="list-group">
+                    {% for task in pending_tasks %}
+                        <li class="list-group-item">
+                            <strong>{{ task.title }}</strong> - {{ task.status|capfirst }}
+                            <p>{{ task.description }}</p>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">No pending tasks.</li>
+                    {% endfor %}
+                </ul>
             </div>
-            <ul class="sidebar-menu">
-                <li class="active"><a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-                <li><a href="{% url 'task' %}"><i class="fas fa-tasks"></i> <span>Task Management</span></a></li>
-                <li><a href="resource.html"><i class="fas fa-book"></i> <span>Resource Library</span></a></li>
-                <li class="sidebar-divider"></li>
-                <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="Auth.html" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    
+            <!-- Column 2: Team Members -->
+            <div class="col-md-6">
+                <h3>Team Members</h3>
+                <ul class="list-group">
+                    {% for member in team_members %}
+                        <li class="list-group-item">{{ member.full_name }}</li>
+                    {% empty %}
+                        <li class="list-group-item">No team members.</li>
+                    {% endfor %}
+                </ul>
             </div>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="header">
-                <div class="header-left">
-                    <h1>Dashboard</h1>
-                </div>
-                <div class="header-right">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <button><i class="fas fa-search"></i></button>
-                    </div>
-                    <div class="notification-bell">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-count"></span>
-                    </div>
-                    <div class="user-profile">
-                        <img src="/api/placeholder/40/40" alt="User Avatar">
-                        <div class="user-info">
-                            <span class="user-name">Muhammad Nasir</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                    <div class="dashboard-col">
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <h2>Quick Actions</h2>
-                            </div>
-                            <div class="card-content">
-                                <div class="quick-actions">
-                                    <a href="{% url 'task' %}" class="quick-action-btn">
-                                        <i class="fas fa-plus-circle"></i>
-                                        <span>Create New Task</span>
-                                    </a>
-                                    <a href="resources.html?upload=true" class="quick-action-btn">
-                                        <i class="fas fa-upload"></i>
-                                        <span>Upload Resource</span>
-                                    </a>
-                                    <a href="calendar.html?new=true" class="quick-action-btn">
-                                        <i class="fas fa-calendar-plus"></i>
-                                        <span>Schedule Meeting</span>
-                                    </a>
-                                    <a href="teams.html" class="quick-action-btn">
-                                        <i class="fas fa-user-plus"></i>
-                                        <span>Invite Team Member</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Upcoming Deadlines -->
-                        <div class="dashboard-card">
-                            <div class="card-header">
-                                <h2>Upcoming Deadlines</h2>
-                                <a href="#" class="view-all">View All</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
 
-    <script src="{% static 'my-js/main.js' %}"></script>
+{% endblock %}
 </body>
 </html>
